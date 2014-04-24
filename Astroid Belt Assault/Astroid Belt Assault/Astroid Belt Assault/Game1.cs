@@ -75,6 +75,7 @@ namespace Astroid_Belt_Assault
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+
             switch (gameState)
             {
                 case Gamestates.TitleScreen:

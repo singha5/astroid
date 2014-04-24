@@ -54,7 +54,7 @@ namespace Astroid_Belt_Assault
         public Color TintColor
         {
             get { return tintColor; }
-            set { tintColor = value;}
+            set { tintColor = value; }
         }
 
         public float Rotation
@@ -62,6 +62,96 @@ namespace Astroid_Belt_Assault
             get { return rotation; }
             set { rotation = value % MathHelper.TwoPi; }
         }
+        public int Frame
+        {
+            get { return currentFrame; }
+            set
+            {
+                currentFrame = (int)MathHelper.Clamp(value, 0,
+                frames.Count - 1);
+            }
+        }
 
+        public float Framtime
+        {
+            get { return frameTime; }
+            set { frameTime = MathHelper.Max(0, value); }
+        }
+
+        public Rectangle Source
+        {
+            get
+            {
+                return new Rectangle(
+                    (int)location.X,
+                    (int)location.Y,
+                    frameWidth,
+                    frameHeight);
+            }
+        }
+
+        public Vector2 Center
+        {
+            get
+            {
+                return location +
+                    new Vector2(frameWidth / 2, frameHeight / 2);
+            }
+        }
+        public Rectangle BoundingBoxRect
+        {
+            get
+            {
+                return new Rectangle(
+               (int)location.X + BoundingXPadding,
+               (int)location.Y + BoundingYPadding,
+               frameWidth - (BoundingXPadding * 2),
+               frameHeight - (BoundingYPadding * 2));
+            }
+        }
+        public bool IsBoxColliding(Rectangle OtherBox)
+        {
+            return BoundingBoxRect.Intersects(OtherBox);
+        }
+        public bool IsCircleColliding(Vector2 otherCenter, float
+        otherRadius)
+        {
+            if (Vector2.Distance(Center, otherCenter) <
+            (CollisionRadius + otherRadius))
+                return true;
+            else
+                return false;
+        }
+        public void AddFrame(Rectangle frameRectangle)
+        {
+            frames.Add(frameRectangle);
+        }
+        public virtual void Update(GameTime gameTime)
+        {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            timeForCurrentFrame += elapsed;
+
+            if (timeForCurrentFrame >= FrameTime)
+            {
+                currentFrame = (currentFrame + 1) % (frames.Count);
+                timeForCurrentFrame = 0.0f;
+            }
+
+            location += (velocity * elapsed);
+
+        }
+        public virtual void Draw(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(
+                Texture,
+                Center,
+                Source,
+                tintColor,
+                new Vector2(frameWidth / 2, frameHeight / 2),
+                1.3f,
+                SpriteEffects.None,
+                0.0f);
+        }
     }
 }
